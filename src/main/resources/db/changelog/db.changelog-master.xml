@@ -9,6 +9,4 @@
     <include file="db/changelog/liquibase-outputChangeLog_create_lemma.xml"/>
     <include file="db/changelog/liquibase-outputChangeLog_create_index.xml"/>
 
-<!--    <include file="db/changelog/liquibase-outputChangeLog_drop.xml"/>-->
-
 </databaseChangeLog>
