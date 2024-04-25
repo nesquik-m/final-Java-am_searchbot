@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="create-table-site" author="Martova">
+        <sql>
+            CREATE TABLE site (
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            status ENUM('INDEXING', 'INDEXED', 'FAILED') NOT NULL,
+            status_time DATETIME NOT NULL,
+            last_error TEXT,
+            url VARCHAR(255) NOT NULL,
+            name VARCHAR(255) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

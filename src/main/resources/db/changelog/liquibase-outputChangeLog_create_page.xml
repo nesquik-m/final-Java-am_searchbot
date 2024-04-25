@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+        <changeSet id="create-table-page" author="Martova">
+            <sql>
+                CREATE TABLE page (
+                id INT NOT NULL AUTO_INCREMENT,
+                site_id INT NOT NULL,
+                path TEXT NOT NULL,
+                code INT NOT NULL,
+                content MEDIUMTEXT NOT NULL,
+                PRIMARY KEY (id),
+                KEY path(path(50)),
+                FOREIGN KEY (site_id) REFERENCES site(id)
+                );
+            </sql>
+        </changeSet>
+
+</databaseChangeLog>
