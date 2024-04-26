@@ -36,5 +36,6 @@ Maven подключает следующие относящиеся к <i>Sprin
 Lombok (зависимость <i>lombok</i>).
 
 ### Принцип работы
-https://github.com/nesquik-m/AM_SearchBot/assets/154051657/b9f6616a-ae5a-4b2b-9685-3bb20c9fa964
+https://github.com/nesquik-m/AM_SearchBot/assets/154051657/ec38500d-7d73-4319-bd7d-2582bbaae1f2
+
 
