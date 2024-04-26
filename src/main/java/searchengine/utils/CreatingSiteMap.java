@@ -70,15 +70,15 @@ public class CreatingSiteMap extends RecursiveAction {
             String href = getHref(absHref);
 
             boolean linkIsValid = absHref.contains(root) &&
-                    !absHref.contains("#") &&
-                    !absHref.contains("%") &&
-                    !absHref.contains(".jpg") &&
-                    !absHref.contains(".zip") &&
-                    !absHref.contains(".sql") &&
-                    !absHref.contains(".yaml") &&
-                    !absHref.endsWith("null") &&
-                    !href.isEmpty() &&
-                    pageRepository.findByPath(href).isEmpty();
+                        !absHref.contains("#") &&
+                        !absHref.contains("%") &&
+                        !absHref.contains(".jpg") &&
+                        !absHref.contains(".zip") &&
+                        !absHref.contains(".sql") &&
+                        !absHref.contains(".yaml") &&
+                        !absHref.endsWith("null") &&
+                        !href.isEmpty() &&
+                        pageRepository.findByPath(href).isEmpty();
             if (linkIsValid) {
                 String content = getDocument(absHref).html();
                 PageEntity pageEntity = mapToNewPageEntity(siteEntity, href, statusCode, content);
@@ -88,9 +88,8 @@ public class CreatingSiteMap extends RecursiveAction {
                         lemmaRepository, indexRepository, indexingProcessing, connectionProperties);
                 taskList.add(task);
 
-                LemmasAndIndexes lemmasAndIndexes = new LemmasAndIndexes();
-                lemmasAndIndexes.creatingLemmasAndIndexes(siteRepository, lemmaRepository,
-                        indexRepository, siteEntity, pageEntity);
+                LemmasAndIndexes lemmasAndIndexes = new LemmasAndIndexes(siteRepository, lemmaRepository, indexRepository);
+                lemmasAndIndexes.creatingLemmasAndIndexes(siteEntity, pageEntity);
 
                 if (!indexingProcessing.get()) {
                     updateStatusFailed(siteEntity);
@@ -129,7 +128,7 @@ public class CreatingSiteMap extends RecursiveAction {
     private Document getDocument(String url) throws InterruptedException, IOException {
         Thread.sleep(150);
         return Jsoup.connect(url)
-                .timeout(30000)
+                .timeout(90000)
                 .userAgent(connectionProperties.getUserAgent())
                 .referrer(connectionProperties.getReferer())
                 .get();

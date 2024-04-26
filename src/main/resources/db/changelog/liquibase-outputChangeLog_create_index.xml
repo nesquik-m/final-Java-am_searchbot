@@ -12,6 +12,8 @@
             lemma_id INT NOT NULL,
             `rank` FLOAT NOT NULL,
             PRIMARY KEY (id),
+            FOREIGN KEY (page_id) REFERENCES page(id),
+            FOREIGN KEY (lemma_id) REFERENCES lemma(id),
             UNIQUE KEY lemma_page(lemma_id, page_id)
             );
         </sql>

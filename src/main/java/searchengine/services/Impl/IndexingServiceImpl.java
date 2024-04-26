@@ -33,28 +33,22 @@ public class IndexingServiceImpl implements IndexingService {
     private final PageRepository pageRepository;
     private final LemmaRepository lemmaRepository;
     private final IndexRepository indexRepository;
-    private AtomicBoolean indexingProcessing;
 
     @Override
     public void startIndexing(AtomicBoolean indexingProcessing) {
-
-        this.indexingProcessing = indexingProcessing;
         indexingProcessing.set(true);
-
         for (Site site : sites.getSites()) {
-            generalMethod(site, site.getUrl());
+            generalMethod(site, site.getUrl(), indexingProcessing);
         }
     }
 
     @Override
     public void indexPage(Site site, String link, AtomicBoolean indexingProcessing) {
-        this.indexingProcessing = indexingProcessing;
-        this.indexingProcessing.set(true);
-        generalMethod(site, link);
+        indexingProcessing.set(true);
+        generalMethod(site, link, indexingProcessing);
     }
 
-    private void generalMethod(Site site, String link) {
-
+    private void generalMethod(Site site, String link, AtomicBoolean indexingProcessing) {
         int cores = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(cores);
         executor.execute(() -> {

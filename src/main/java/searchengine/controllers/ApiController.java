@@ -33,7 +33,7 @@ public class ApiController {
     }
 
     @GetMapping("/startIndexing")
-    public ResponseEntity startIndexing() {
+    public ResponseEntity<Object> startIndexing() {
 
         if (indexingProcessing.get()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new FalseResponse("Индексация уже запущена"));
@@ -47,7 +47,7 @@ public class ApiController {
     }
 
     @GetMapping("/stopIndexing")
-    public ResponseEntity stopIndexing() {
+    public ResponseEntity<Object> stopIndexing() {
 
         if (!indexingProcessing.get()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new FalseResponse("Индексация не запущена"));
@@ -57,7 +57,7 @@ public class ApiController {
     }
 
     @PostMapping("/indexPage")
-    public ResponseEntity indexPage(@RequestParam String url) {
+    public ResponseEntity<Object> indexPage(@RequestParam String url) {
 
         for (Site site : sites.getSites()) {
             if (url.startsWith(site.getUrl())) {

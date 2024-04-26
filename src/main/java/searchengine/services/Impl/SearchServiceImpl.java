@@ -93,7 +93,7 @@ public class SearchServiceImpl implements SearchService {
         return searchResponse;
     }
 
-    private String getSnippet(String text) throws IOException {
+    private String getSnippet(String text) {
 
         String cleanText = insertingTags(text);
         StringBuilder snippet = new StringBuilder();
@@ -119,10 +119,15 @@ public class SearchServiceImpl implements SearchService {
         return snippet.toString();
     }
 
-    private String insertingTags(String text) throws IOException {
+    private String insertingTags(String text) {
 
         String textWithoutTags = Jsoup.parse(text).body().text();
-        LuceneMorphology luceneMorph = new RussianLuceneMorphology();
+        LuceneMorphology luceneMorph;
+        try {
+            luceneMorph = new RussianLuceneMorphology();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         String[] words = textWithoutTags.replaceAll("[^А-я\\s]", "").trim().split("\\s+");
 
@@ -174,11 +179,12 @@ public class SearchServiceImpl implements SearchService {
         return pagesAndAbsRelevanceMap;
     }
 
-    private Map<PageEntity, Float> getRelevantPagesForTheQuery(Map<PageEntity, Float> pageEntityMap, List<LemmaEntity> lemmaEntitySet) {
-
+    private Map<PageEntity, Float> getRelevantPagesForTheQuery(Map<PageEntity, Float> pageEntityMap,
+                                                               List<LemmaEntity> lemmaEntitySet) {
         for (Map.Entry<PageEntity, Float> pageEntity : pageEntityMap.entrySet()) {
             for (int i = 1; i < lemmaEntitySet.size(); i++) {
-                Optional<IndexEntity> optionalIndexEntity = indexRepository.findByPageEntityAndLemmaEntity(pageEntity.getKey(), lemmaEntitySet.get(i));
+                Optional<IndexEntity> optionalIndexEntity =
+                        indexRepository.findByPageEntityAndLemmaEntity(pageEntity.getKey(), lemmaEntitySet.get(i));
                 if (optionalIndexEntity.isEmpty()) {
                     pageEntityMap.remove(pageEntity.getKey());
                     continue;
@@ -197,7 +203,7 @@ public class SearchServiceImpl implements SearchService {
                 pageEntity.getPath();
         try {
             Thread.sleep(150);
-            doc = Jsoup.connect(url).timeout(6 * 10000).get();
+            doc = Jsoup.connect(url).timeout(9 * 10000).get();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -222,7 +228,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     private Set<String> lemmasInQuery(String query) throws IOException {
-        LemmasAndIndexes lemmasAndIndexes = new LemmasAndIndexes();
+        LemmasAndIndexes lemmasAndIndexes = new LemmasAndIndexes(siteRepository, lemmaRepository, indexRepository);
         return lemmasAndIndexes.collectLemmas(query).keySet();
     }
 

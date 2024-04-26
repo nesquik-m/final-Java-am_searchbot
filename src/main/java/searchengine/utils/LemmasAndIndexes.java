@@ -2,6 +2,7 @@ package searchengine.utils;
 
 import org.apache.lucene.morphology.LuceneMorphology;
 import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
+import org.springframework.stereotype.Component;
 import searchengine.model.IndexEntity;
 import searchengine.model.LemmaEntity;
 import searchengine.model.PageEntity;
@@ -15,34 +16,42 @@ import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
+@Component
 public class LemmasAndIndexes {
 
     private final LuceneMorphology luceneMorph = new RussianLuceneMorphology();
-    private IndexRepository indexRepository;
+    private final SiteRepository siteRepository;
+    private final LemmaRepository lemmaRepository;
+    private final IndexRepository indexRepository;
 
-    public LemmasAndIndexes() throws IOException {
+    public LemmasAndIndexes(SiteRepository siteRepository, LemmaRepository lemmaRepository,
+                            IndexRepository indexRepository) throws IOException {
+        this.siteRepository = siteRepository;
+        this.lemmaRepository = lemmaRepository;
+        this.indexRepository = indexRepository;
     }
 
-    public void creatingLemmasAndIndexes(SiteRepository siteRepository, LemmaRepository lemmaRepository,
-                                         IndexRepository indexRepository, SiteEntity siteEntity, PageEntity pageEntity) {
+    public void creatingLemmasAndIndexes(SiteEntity siteEntity, PageEntity pageEntity) {
 
-        this.indexRepository = indexRepository;
-
-        HashMap<String, Integer> lemmas = collectLemmas(pageEntity.getContent());
-        for (Entry<String, Integer> lemma : lemmas.entrySet()) {
-            Optional<LemmaEntity> optionalLemmaEntity = lemmaRepository.findBySiteIdAndLemma(siteEntity, lemma.getKey());
-            LemmaEntity lemmaEntity;
-            if (optionalLemmaEntity.isEmpty()) {
-                lemmaEntity = mapToNewLemmaEntity(siteEntity, lemma.getKey());
-                lemmaRepository.save(lemmaEntity);
-            } else {
-                lemmaEntity = optionalLemmaEntity.get();
-                lemmaEntity.setFrequency(lemmaEntity.getFrequency() + 1);
-                lemmaRepository.save(lemmaEntity);
+        try {
+            HashMap<String, Integer> lemmas = collectLemmas(pageEntity.getContent());
+            for (Entry<String, Integer> lemma : lemmas.entrySet()) {
+                Optional<LemmaEntity> optionalLemmaEntity = lemmaRepository.findBySiteIdAndLemma(siteEntity, lemma.getKey());
+                LemmaEntity lemmaEntity;
+                if (optionalLemmaEntity.isEmpty()) {
+                    lemmaEntity = mapToNewLemmaEntity(siteEntity, lemma.getKey());
+                    lemmaRepository.save(lemmaEntity);
+                } else {
+                    lemmaEntity = optionalLemmaEntity.get();
+                    lemmaEntity.setFrequency(lemmaEntity.getFrequency() + 1);
+                    lemmaRepository.save(lemmaEntity);
+                }
+                mapAndSaveToNewIndexEntity(pageEntity, lemmaEntity, lemma.getValue());
+                siteEntity.setStatusTime(Instant.now());
+                siteRepository.save(siteEntity);
             }
-            mapAndSaveToNewIndexEntity(pageEntity, lemmaEntity, lemma.getValue());
-            siteEntity.setStatusTime(Instant.now());
-            siteRepository.save(siteEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -11,7 +11,8 @@
             site_id INT NOT NULL,
             lemma VARCHAR(255) NOT NULL,
             frequency INT NOT NULL,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            FOREIGN KEY (site_id) REFERENCES site(id)
             );
         </sql>
     </changeSet>
